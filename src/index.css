@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Thin, consistent scrollbars (best-effort) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.6) transparent;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+html.dark body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+/* Utility for subtle glassy surfaces */
+.surface {
+  @apply rounded-xl border border-slate-200 bg-white/80 shadow-sm backdrop-blur;
+}
+html.dark .surface {
+  @apply border-slate-800 bg-slate-900/60;
+}
