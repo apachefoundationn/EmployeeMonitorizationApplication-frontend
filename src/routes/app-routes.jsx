@@ -40,7 +40,7 @@ export function AppRoutes() {
 
       <Route element={<ProtectedRoute allowRoles={[roles.employee, roles.admin, roles.manager]} />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/" element={<DefaultRedirect />} />
+          { <Route path="/" element={<DefaultRedirect />} /> }
 
           <Route element={<ProtectedRoute allowRoles={[roles.employee, roles.manager]} />}>
             <Route path="/employee" element={<EmployeeDashboardPage />} />

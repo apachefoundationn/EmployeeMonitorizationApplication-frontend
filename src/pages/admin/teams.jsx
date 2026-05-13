@@ -23,7 +23,7 @@ function AttachmentList({ files }) {
         const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
         if (isImage) return <img key={i} src={`${baseUrl}${url}`} alt="attachment" className="h-16 w-16 object-cover rounded" />
         if (isVideo) return <video key={i} src={`${baseUrl}${url}`} controls className="h-16 w-24 object-cover rounded" />
-        return <a key={i} href={`${baseUrl}${url}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">File {i+1}</a>
+        return <a key={i} href={`${baseUrl}${url}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">File {i + 1}</a>
       })}
     </div>
   )
@@ -58,6 +58,7 @@ export function AdminTeamsPage() {
   const [taskForm, setTaskForm] = useState(EMPTY_TASK_FORM)
 
   async function loadData() {
+
     setLoading(true)
     try {
       const [teamData, userData] = await Promise.all([api.listTeams(), api.listUserOptions()])
@@ -71,6 +72,7 @@ export function AdminTeamsPage() {
     } finally {
       setLoading(false)
     }
+
   }
 
   useEffect(() => {
@@ -166,10 +168,17 @@ export function AdminTeamsPage() {
   async function onAddMember() {
     if (!selectedTeam || !memberForm.userId) return
     try {
-      const updatedTeam = await api.addTeamMember(selectedTeam.id, { userId: Number(memberForm.userId) })
+      const addedUserId = Number(memberForm.userId)
+      const updatedTeam = await api.addTeamMember(selectedTeam.id, { userId: addedUserId })
       setTeams((current) => current.map((team) => (team.id === updatedTeam.id ? updatedTeam : team)))
       setSelectedTeam(updatedTeam)
       setMemberForm(EMPTY_MEMBER_FORM)
+      // Instantly update the users state so the dropdown reflects the change
+      setUsers((current) =>
+        current.map((user) =>
+          user.id === addedUserId ? { ...user, teamId: updatedTeam.id } : user
+        )
+      )
     } catch (e) {
       toast.push({ title: 'Add member failed', message: e?.message ?? '', variant: 'danger' })
     }
@@ -181,6 +190,12 @@ export function AdminTeamsPage() {
       const updatedTeam = await api.removeTeamMember(selectedTeam.id, userId)
       setTeams((current) => current.map((team) => (team.id === updatedTeam.id ? updatedTeam : team)))
       setSelectedTeam(updatedTeam)
+      // Instantly update the users state so the user becomes available again
+      setUsers((current) =>
+        current.map((user) =>
+          user.id === userId ? { ...user, teamId: null } : user
+        )
+      )
     } catch (e) {
       toast.push({ title: 'Remove member failed', message: e?.message ?? '', variant: 'danger' })
     }
@@ -220,10 +235,11 @@ export function AdminTeamsPage() {
   }
 
   const availableUsers = useMemo(() => {
-    const currentIds = new Set((selectedTeam?.members || []).map((member) => member.userId))
+    console.log(users)
+    if (!Array.isArray(users)) return []
     const teamManagerId = selectedTeam?.managerId ?? null
     return users
-      .filter((user) => !currentIds.has(user.id))
+      .filter((user) => user.teamId == null)
       .filter((user) => user.role !== 'admin')
       .filter((user) => !teamManagerId || user.id !== teamManagerId)
       .map((user) => ({ value: String(user.id), label: `${user.name} (${user.email}) - ${user.role}` }))
@@ -269,11 +285,11 @@ export function AdminTeamsPage() {
                   label="User"
                   value={memberForm.userId}
                   onChange={(e) => setMemberForm((current) => ({ ...current, userId: e.target.value }))}
-                  options={availableUsers.length ? availableUsers : [{ value: '', label: 'No available users' }]}
+                  options={availableUsers.length ? [{ value: '', label: 'Select a user...' }, ...availableUsers] : [{ value: '', label: 'No available users' }]}
                   disabled={!availableUsers.length}
                 />
                 <div className="flex items-end">
-                  <Button onClick={onAddMember} disabled={!memberForm.userId}>
+                  <Button onClick={onAddMember}>
                     Add Member
                   </Button>
                 </div>

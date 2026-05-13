@@ -28,7 +28,8 @@ function toUiAttendance(records) {
 function computeToday(att) {
   const today = att[0]
   const status = today?.status ?? 'Unknown'
-  const hours = today?.totalHours ?? 0
+  const rawHours = today?.totalHours ?? 0
+  const hours = Number(Number(rawHours).toFixed(2))
   return { status, hours, checkIn: today?.checkIn, checkOut: today?.checkOut }
 }
 
@@ -46,7 +47,8 @@ export function EmployeeDashboardPage() {
     try {
       const [records, wh] = await Promise.all([api.myAttendance(), api.weeklyHours()])
       setAttendance(toUiAttendance(records))
-      setWeeklyHours(wh?.totalWeeklyHours || 0)
+      const rawWeekly = wh?.totalWeeklyHours || 0
+      setWeeklyHours(Number(Number(rawWeekly).toFixed(2)))
     } catch (e) {
       toast.push({ title: 'Backend not reachable', message: e?.message ?? 'Using empty state.', variant: 'danger' })
       setAttendance([])
@@ -62,15 +64,21 @@ export function EmployeeDashboardPage() {
 
   const today = useMemo(() => computeToday(attendance), [attendance])
   const weekly = useMemo(() => {
+    if (!Array.isArray(attendance)) return []
     const byDay = new Map()
     attendance.forEach((r) => {
       if (!r.date) return
-      byDay.set(r.date, (byDay.get(r.date) || 0) + (Number(r.totalHours) || 0))
+      const parsedHours = Number(r.totalHours)
+      const validHours = isNaN(parsedHours) ? 0 : parsedHours
+      byDay.set(r.date, (byDay.get(r.date) || 0) + validHours)
     })
     return [...byDay.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
       .slice(-7)
-      .map(([date, hours]) => ({ day: new Date(`${date}T00:00:00`).toLocaleDateString([], { weekday: 'short' }), hours }))
+      .map(([date, hours]) => ({
+        day: new Date(`${date}T00:00:00`).toLocaleDateString([], { weekday: 'short' }),
+        hours: Number(hours.toFixed(2))
+      }))
   }, [attendance])
 
   async function onCheckIn() {

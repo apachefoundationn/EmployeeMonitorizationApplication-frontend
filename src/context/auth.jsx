@@ -1,12 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { api } from '../utils/api.js'
 import { getSession } from '../utils/storage.js'
+import { useToast } from './toast.jsx'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const toast = useToast()
 
   useEffect(() => {
     const saved = getSession()
@@ -26,6 +28,42 @@ export function AuthProvider({ children }) {
     }
     boot()
   }, [])
+
+  // Auto-logout after 20 minutes of inactivity
+  useEffect(() => {
+    let timeoutId;
+
+    const resetTimeout = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (user) {
+        timeoutId = setTimeout(() => {
+          api.logout();
+          setUser(null);
+          toast.push({
+            title: 'Session Expired',
+            message: 'You have been automatically logged out due to 20 minutes of inactivity.',
+            timeoutMs: 5000,
+          });
+        }, 20 * 60 * 1000); // 20 minutes
+      }
+    };
+
+    resetTimeout();
+
+    const handleActivity = () => {
+      resetTimeout();
+    };
+
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    if (user) {
+      events.forEach(event => window.addEventListener(event, handleActivity));
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      events.forEach(event => window.removeEventListener(event, handleActivity));
+    };
+  }, [user, toast]);
 
   const value = useMemo(() => {
     async function login({ email, password }) {
