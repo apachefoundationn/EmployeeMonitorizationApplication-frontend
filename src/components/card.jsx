@@ -16,3 +16,7 @@ export function CardContent({ className, ...props }) {
   return <div className={cn('px-5 py-4', className)} {...props} />
 }
 
+export function CardDescription({ className, ...props }) {
+  return <p className={cn('text-sm text-slate-500 dark:text-slate-400', className)} {...props} />
+}
+

@@ -25,6 +25,7 @@ export function AdminAttendancePage() {
       name: r.user?.name ?? '—',
       department: r.user?.department ?? '—',
       checkIn: r.sign_in_time ? new Date(r.sign_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null,
+      checkOut: r.sign_out_time ? new Date(r.sign_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null,
       status: r.status ? r.status[0].toUpperCase() + r.status.slice(1) : 'Present',
     }))
   }, [rowsRaw])
@@ -62,6 +63,7 @@ export function AdminAttendancePage() {
       { key: 'name', header: 'Employee' },
       { key: 'department', header: 'Department' },
       { key: 'checkIn', header: 'Check-in', render: (r) => r.checkIn ?? '—' },
+      { key: 'checkOut', header: 'Check-out', render: (r) => r.checkOut ?? '—' },
       { key: 'status', header: 'Status', render: (r) => <Badge>{r.status}</Badge> },
     ],
     [],

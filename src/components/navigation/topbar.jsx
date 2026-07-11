@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut, Moon, Sun } from 'lucide-react'
+import { ChevronDown, LogOut, Moon, Sun, Key } from 'lucide-react'
 import { useAuth } from '../../context/auth.jsx'
 import { useTheme } from '../../context/theme.jsx'
 import { Button } from '../button.jsx'
@@ -62,6 +62,16 @@ export function Topbar() {
 
             {open ? (
               <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+                <button
+                  className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800"
+                  onClick={() => {
+                    navigate('/change-password')
+                    setOpen(false)
+                  }}
+                >
+                  <Key className="h-4 w-4" />
+                  Change Password
+                </button>
                 <button
                   className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
                   onClick={onLogout}

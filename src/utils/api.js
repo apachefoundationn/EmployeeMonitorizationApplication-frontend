@@ -86,6 +86,17 @@ export const api = {
   logout() {
     clearSession()
   },
+  async sendOtp() {
+    return await apiFetch('/api/auth/send-otp', {
+      method: 'POST',
+    })
+  },
+  async changePassword({ otp, newPassword }) {
+    return await apiFetch('/api/auth/password', {
+      method: 'PUT',
+      body: { otp, newPassword },
+    })
+  },
 
   // Admin user management
   async listUsers({ page = 1, limit = 10 } = {}) {

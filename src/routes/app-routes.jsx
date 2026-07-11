@@ -21,6 +21,7 @@ import { AdminAttendancePage } from '../pages/admin/attendance.jsx'
 import { AdminReportsPage } from '../pages/admin/reports.jsx'
 import { AdminRequestsPage } from '../pages/admin/requests.jsx'
 import { AdminTeamsPage } from '../pages/admin/teams.jsx'
+import { ChangePasswordPage } from '../pages/auth/change-password.jsx'
 
 function DefaultRedirect() {
   const { user } = useAuth()
@@ -59,6 +60,7 @@ export function AppRoutes() {
           </Route>
 
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
         </Route>
       </Route>
 

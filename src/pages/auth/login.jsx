@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/card.
 import { useAuth } from '../../context/auth.jsx'
 import { useToast } from '../../context/toast.jsx'
 import { roles } from '../../constants/roles.js'
+// import { ThemeProvider } from '.../context/theme.jsx'
 
 function redirectForRole(role) {
   if (role === roles.admin) return '/admin'
@@ -40,6 +41,7 @@ export function LoginPage() {
   }
 
   return (
+    // <ThemeProvider>
     <Card className="mx-auto w-full max-w-md">
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
@@ -67,6 +69,7 @@ export function LoginPage() {
         </form>
       </CardContent>
     </Card>
+    // </ThemeProvider>
   )
 }
 
